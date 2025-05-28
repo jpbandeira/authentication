@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authentication
+  namespace: authentication
+  labels:
+    app: authentication
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: authentication
+  template:
+    metadata:
+      labels:
+        app: authentication
+    spec:
+      containers:
+      - name: authentication
+        image: authentication:20250528-0007
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8082
+        env:
+        - name: DB_USER
+          value: "fidelity"
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: password
+        - name: DB_HOST
+          value: postgres.database.svc.cluster.local
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_NAME
+          value: "authentication_db"
+        - name: PORT
+          value: "8082"
+        - name: JWT_SECRET
+          value: "9780fc1e5cdd28c259b458a475b0989d65aad369e92cf777ba9231084307aad0246ac314e423e8df577c9febb631759cd1b3fe7b01b3506b50907ce5dd197bf58cfa9e888f44083f7ef911fae395321821d57608b108eeb418652db0fa40dd928c3e82604934b79aae024abc0580b6f48c3b1318f0fdd63939b9366b92e9262e63c7e9fd045db12da09242999953208341b271ed4a0f0a2e22a0d276582cf96c4a2c50c1dda6e47c3f2a1211111fbe6f9ea68b9736dbf67ea54fe3b8e460231b38cd8067a9f647dc798023d5edd63088c57c60b4dcb2a84837adff9042c99d6bfb90496a3355256abfd5db81fd86cc0aab2ac019cd1ea1276ec894f2c1af158d6c37b8e9c6a13a7d7d36ec05df4d8c07654b54cefcd66c519394efa435965ddc7264afce1bbb03ba3f8277f7b6b74394db2fb216ab9197e86c5e2a643d3a5a2be54673bb51543c38e72a3cc83d8f93b33eb41573ea263b780d2d3557cc56c2d657cb303d313234be61cfdc973c27e927f84c23c7bebab6d4cafda85618667d47cff3efc2861e2c2eb7216fde7733056d627c174170a1c7150f18a821abcf5920c94221338ee086290beac7d094ebdd043375700d9709407fa09e516f1ed53b4693c84b5aefff4bac02829c75afa425e02a64d739cd1fbcccb71451b2a0ce614ec5162ee2dad2e8586119924644f2d6631b48bed891e79d0138c1eae1adfbcd2b"
