@@ -2,36 +2,40 @@ package repository
 
 import (
 	"context"
-	"database/sql"
 	"log"
 
-	"github.com/jp/authentication/internal/model"
+	"github.com/jp/authentication/internal/repository/model"
+	rmodel "github.com/jp/authentication/internal/repository/model"
+	smodel "github.com/jp/authentication/internal/service/model"
+	"gorm.io/gorm"
 )
 
 type UserRepository struct {
-	db *sql.DB
+	db *gorm.DB
 }
 
-func NewUserRepository(db *sql.DB) *UserRepository {
+func NewUserRepository(db *gorm.DB) *UserRepository {
 	return &UserRepository{db: db}
 }
 
 func (r *UserRepository) Create(ctx context.Context, user *model.User) error {
-	query := `INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING id`
-	err := r.db.QueryRowContext(ctx, query, user.Name, user.Email, user.Password).Scan(&user.ID)
-	if err != nil {
+	if err := r.db.WithContext(ctx).Create(user).Error; err != nil {
 		log.Printf("[%v] erro ao criar usuário: %v", ctx.Value("req_id"), err)
 		return err
 	}
 	return nil
 }
 
-func (r *UserRepository) FindByEmail(ctx context.Context, email string) (*model.User, error) {
-	query := `SELECT id, name, email, password FROM users WHERE email = $1`
-	user := &model.User{}
-	err := r.db.QueryRowContext(ctx, query, email).Scan(&user.ID, &user.Name, &user.Email, &user.Password)
-	if err != nil {
+func (r *UserRepository) FindByEmail(ctx context.Context, email string) (*smodel.User, error) {
+	var user rmodel.User
+	if err := r.db.WithContext(ctx).Where("email = ?", email).First(&user).Error; err != nil {
+		log.Printf("[%v] erro ao buscar usuário por email: %v", ctx.Value("req_id"), err)
 		return nil, err
 	}
-	return user, nil
+	return &smodel.User{
+		ID:       int64(user.ID),
+		Name:     user.Name,
+		Email:    user.Email,
+		Password: user.Password,
+	}, nil
 }

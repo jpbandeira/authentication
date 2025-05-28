@@ -2,15 +2,44 @@ package database
 
 import (
 	"context"
-	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 	"os"
+	"time"
 
-	_ "github.com/lib/pq"
+	"github.com/joho/godotenv"
+	"github.com/jp/authentication/internal/repository/model"
+
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	gormlogger "gorm.io/gorm/logger"
 )
 
-func Connect(ctx context.Context) (*sql.DB, error) {
+var errNoModelDefined = errors.New("no model defined")
+
+func defaultGormLogger() gormlogger.Interface {
+	return gormlogger.New(
+		log.New(os.Stdout, "\r\n", log.LstdFlags),
+		gormlogger.Config{
+			SlowThreshold:             1 * time.Second,
+			LogLevel:                  gormlogger.Info,
+			IgnoreRecordNotFoundError: true,
+			ParameterizedQueries:      true,
+			Colorful:                  false,
+		},
+	)
+}
+
+func databaseModels() []any {
+	return []any{
+		model.User{},
+	}
+}
+
+func Connect(ctx context.Context) (*gorm.DB, error) {
+	_ = godotenv.Load()
+
 	password := os.Getenv("DB_PASSWORD")
 	user := os.Getenv("DB_USER")
 	host := os.Getenv("DB_HOST")
@@ -31,18 +60,24 @@ func Connect(ctx context.Context) (*sql.DB, error) {
 	}
 
 	dsn := fmt.Sprintf(
-		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
-		user, password, host, port, dbName,
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		host, port, user, password, dbName,
 	)
 
-	db, err := sql.Open("postgres", dsn)
+	if len(databaseModels()) == 0 {
+		return nil, errNoModelDefined
+	}
+
+	gormLogger := defaultGormLogger()
+	gormConfig := gorm.Config{Logger: gormLogger}
+
+	db, err := gorm.Open(postgres.Open(dsn), &gormConfig)
 	if err != nil {
-		log.Printf("Erro ao abrir conexão: %v", err)
 		return nil, err
 	}
 
-	if err = db.PingContext(ctx); err != nil {
-		log.Printf("Erro ao pingar o banco: %v", err)
+	err = db.AutoMigrate(databaseModels()...)
+	if err != nil {
 		return nil, err
 	}
 

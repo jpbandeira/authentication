@@ -16,7 +16,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("Erro ao conectar no banco: %v", err)
 	}
-	defer db.Close()
 
 	r := router.Setup(ctx, db)
 	r.Run(":" + config.Port())

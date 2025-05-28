@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/jp/authentication/internal/config"
-	"github.com/jp/authentication/internal/model"
+	smodel "github.com/jp/authentication/internal/service/model"
 
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
@@ -27,7 +27,7 @@ func (s *AuthService) CheckPassword(hash, password string) bool {
 	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(password)) == nil
 }
 
-func (s *AuthService) GenerateToken(user *model.User) (string, error) {
+func (s *AuthService) GenerateToken(user *smodel.User) (string, error) {
 	claims := jwt.MapClaims{
 		"sub":   user.ID,
 		"name":  user.Name,

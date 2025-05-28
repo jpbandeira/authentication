@@ -4,7 +4,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/jp/authentication/internal/model"
+	dtoModel "github.com/jp/authentication/internal/model"
+	rModel "github.com/jp/authentication/internal/repository/model"
+
 	"github.com/jp/authentication/internal/repository"
 	"github.com/jp/authentication/internal/service"
 
@@ -22,7 +24,7 @@ func NewAuthHandler(r *repository.UserRepository, a *service.AuthService) *AuthH
 
 func (h *AuthHandler) Register(c *gin.Context) {
 	ctx := c.Request.Context()
-	var user model.User
+	var user dtoModel.User
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "dados inválidos"})
 		return
@@ -35,7 +37,11 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 	user.Password = hashed
-	if err := h.repo.Create(ctx, &user); err != nil {
+	if err := h.repo.Create(ctx, &rModel.User{
+		Name:     user.Name,
+		Email:    user.Email,
+		Password: user.Password,
+	}); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "erro ao cadastrar"})
 		return
 	}
