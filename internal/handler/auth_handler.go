@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/google/uuid"
 	dtoModel "github.com/jp/authentication/internal/model"
 	rModel "github.com/jp/authentication/internal/repository/model"
 
@@ -37,15 +38,19 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 	user.Password = hashed
-	if err := h.repo.Create(ctx, &rModel.User{
+
+	userRepo := &rModel.User{
+		UUID:     uuid.NewString(),
 		Name:     user.Name,
 		Email:    user.Email,
 		Password: user.Password,
-	}); err != nil {
+	}
+
+	if err := h.repo.Create(ctx, userRepo); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "erro ao cadastrar"})
 		return
 	}
-	c.JSON(http.StatusCreated, gin.H{"id": user.ID})
+	c.JSON(http.StatusCreated, gin.H{"id": userRepo.UUID})
 }
 
 func (h *AuthHandler) Login(c *gin.Context) {

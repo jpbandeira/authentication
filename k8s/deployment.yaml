@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
       - name: authentication
-        image: authentication:20250528-0045
+        image: authentication:20250529-2314
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8082

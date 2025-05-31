@@ -3,6 +3,7 @@ package router
 import (
 	"context"
 
+	"github.com/gin-contrib/cors"
 	"github.com/jp/authentication/internal/handler"
 	"github.com/jp/authentication/internal/repository"
 	"github.com/jp/authentication/internal/service"
@@ -12,13 +13,15 @@ import (
 )
 
 func Setup(ctx context.Context, db *gorm.DB) *gin.Engine {
-	r := gin.Default()
+	router := gin.Default()
+	router.HandleMethodNotAllowed = true
+	router.Use(cors.Default())
 	repo := repository.NewUserRepository(db)
 	authService := service.NewAuthService()
 	authHandler := handler.NewAuthHandler(repo, authService)
 
-	r.POST("/register", authHandler.Register)
-	r.POST("/login", authHandler.Login)
+	router.POST("/register", authHandler.Register)
+	router.POST("/login", authHandler.Login)
 
-	return r
+	return router
 }

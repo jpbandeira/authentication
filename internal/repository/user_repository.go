@@ -33,7 +33,7 @@ func (r *UserRepository) FindByEmail(ctx context.Context, email string) (*smodel
 		return nil, err
 	}
 	return &smodel.User{
-		ID:       int64(user.ID),
+		ID:       user.UUID,
 		Name:     user.Name,
 		Email:    user.Email,
 		Password: user.Password,
