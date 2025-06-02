@@ -22,7 +22,7 @@ func Setup(ctx context.Context, db *gorm.DB) *gin.Engine {
 
 	router.POST("/register", authHandler.Register)
 	router.POST("/login", authHandler.Login)
-	router.POST("/auth/google/callback", authHandler.GoogleCallbackHandler)
+	router.GET("/auth/google/callback", authHandler.GoogleCallbackHandler)
 
 	return router
 }
