@@ -34,6 +34,7 @@ func defaultGormLogger() gormlogger.Interface {
 func databaseModels() []any {
 	return []any{
 		model.User{},
+		model.GoogleToken{},
 	}
 }
 

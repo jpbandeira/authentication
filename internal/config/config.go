@@ -3,12 +3,16 @@ package config
 import (
 	"log"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 func Port() string {
-	port := os.Getenv("PORT")
+	_ = godotenv.Load()
+
+	port := os.Getenv("AUTH_PORT")
 	if port == "" {
-		port = "8082"
+		port = "8083"
 	}
 	return port
 }

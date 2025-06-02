@@ -16,12 +16,13 @@ func Setup(ctx context.Context, db *gorm.DB) *gin.Engine {
 	router := gin.Default()
 	router.HandleMethodNotAllowed = true
 	router.Use(cors.Default())
-	repo := repository.NewUserRepository(db)
+	repo := repository.NewRepository(db)
 	authService := service.NewAuthService()
 	authHandler := handler.NewAuthHandler(repo, authService)
 
 	router.POST("/register", authHandler.Register)
 	router.POST("/login", authHandler.Login)
+	router.POST("/auth/google/callback", authHandler.GoogleCallbackHandler)
 
 	return router
 }

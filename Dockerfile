@@ -22,7 +22,7 @@ WORKDIR /root/
 COPY --from=builder /app/authentication .
 
 # Porta que o serviço vai escutar
-EXPOSE 8082
+EXPOSE 8083
 
 # Comando para iniciar o serviço
 CMD ["./authentication"]

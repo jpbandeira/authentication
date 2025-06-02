@@ -10,15 +10,15 @@ import (
 	"gorm.io/gorm"
 )
 
-type UserRepository struct {
+type Repository struct {
 	db *gorm.DB
 }
 
-func NewUserRepository(db *gorm.DB) *UserRepository {
-	return &UserRepository{db: db}
+func NewRepository(db *gorm.DB) *Repository {
+	return &Repository{db: db}
 }
 
-func (r *UserRepository) Create(ctx context.Context, user *model.User) error {
+func (r *Repository) Create(ctx context.Context, user *model.User) error {
 	if err := r.db.WithContext(ctx).Create(user).Error; err != nil {
 		log.Printf("[%v] erro ao criar usuário: %v", ctx.Value("req_id"), err)
 		return err
@@ -26,7 +26,7 @@ func (r *UserRepository) Create(ctx context.Context, user *model.User) error {
 	return nil
 }
 
-func (r *UserRepository) FindByEmail(ctx context.Context, email string) (*smodel.User, error) {
+func (r *Repository) FindByEmail(ctx context.Context, email string) (*smodel.User, error) {
 	var user rmodel.User
 	if err := r.db.WithContext(ctx).Where("email = ?", email).First(&user).Error; err != nil {
 		log.Printf("[%v] erro ao buscar usuário por email: %v", ctx.Value("req_id"), err)
