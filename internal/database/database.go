@@ -8,7 +8,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/joho/godotenv"
 	"github.com/jp/authentication/internal/repository/model"
 
 	"gorm.io/driver/postgres"
@@ -39,8 +38,6 @@ func databaseModels() []any {
 }
 
 func Connect(ctx context.Context) (*gorm.DB, error) {
-	_ = godotenv.Load()
-
 	password := os.Getenv("DB_PASSWORD")
 	user := os.Getenv("DB_USER")
 	host := os.Getenv("DB_HOST")

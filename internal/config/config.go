@@ -3,13 +3,9 @@ package config
 import (
 	"log"
 	"os"
-
-	"github.com/joho/godotenv"
 )
 
-func Port() string {
-	_ = godotenv.Load()
-
+func HostPort() string {
 	port := os.Getenv("AUTH_PORT")
 	if port == "" {
 		port = "8083"
@@ -23,4 +19,11 @@ func JWTSecret() string {
 		log.Fatal("JWT_SECRET não definido")
 	}
 	return secret
+}
+func ClientPort() string {
+	clientPort := os.Getenv("CLIENT_PORT")
+	if clientPort == "" {
+		log.Fatal("CLIENT_PORT não definido")
+	}
+	return clientPort
 }
