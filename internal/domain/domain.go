@@ -10,7 +10,7 @@ type Domain interface {
 
 	Login(context.Context, string, string) (string, error)
 
-	SaveToken(ctx context.Context, code string) (User, error)
+	GoogleOAuthLogin(ctx context.Context, code string) (string, error)
 	IsFirstLogin(ctx context.Context, email string) bool
 }
 

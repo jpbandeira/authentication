@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/jp/authentication/internal/pkg/auth_jwt"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 )
@@ -39,7 +40,7 @@ func FetchUserEmail(client *http.Client) (string, error) {
 	return result.Email, err
 }
 
-func (d *domain) SaveToken(ctx context.Context, code string) (User, error) {
+func (d *domain) GoogleOAuthLogin(ctx context.Context, code string) (string, error) {
 	var googleOAuthConfig = &oauth2.Config{
 		ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
 		ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
@@ -54,18 +55,18 @@ func (d *domain) SaveToken(ctx context.Context, code string) (User, error) {
 
 	token, err := googleOAuthConfig.Exchange(ctx, code)
 	if err != nil {
-		return User{}, err
+		return "", err
 	}
 
 	client := googleOAuthConfig.Client(ctx, token)
 	email, err := FetchUserEmail(client)
 	if err != nil {
-		return User{}, err
+		return "", err
 	}
 
 	user, err := d.db.FindByEmail(ctx, email)
 	if err != nil {
-		return User{}, err
+		return "", err
 	}
 
 	err = d.db.SaveGoogleToken(ctx, GoogleToken{
@@ -76,10 +77,15 @@ func (d *domain) SaveToken(ctx context.Context, code string) (User, error) {
 		Expiry:       token.Expiry,
 	})
 	if err != nil {
-		return User{}, err
+		return "", err
 	}
 
-	return user, nil
+	userToken, err := auth_jwt.GenerateToken(user.ID, user.Name, user.Email, d.secret)
+	if err != nil {
+		return "", err
+	}
+
+	return userToken, nil
 }
 
 func (d *domain) IsFirstLogin(ctx context.Context, email string) bool {

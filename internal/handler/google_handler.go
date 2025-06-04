@@ -3,7 +3,6 @@ package handler
 import (
 	"fmt"
 	"net/http"
-	"net/url"
 
 	"github.com/gin-gonic/gin"
 )
@@ -20,18 +19,16 @@ func (h *AuthHandler) GoogleCallbackHandler(c *gin.Context) {
 		return
 	}
 
-	user, err := h.domain.SaveToken(ctx, code)
+	userToken, err := h.domain.GoogleOAuthLogin(ctx, code)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	redirectURL := fmt.Sprintf(
-		"http://local.fidelity.com:%s/client?id=%s&name=%s&email=%s",
+		"http://local.fidelity.com:%s/login?token=%s",
 		h.ClientPort,
-		url.QueryEscape(user.ID),
-		url.QueryEscape(user.Name),
-		url.QueryEscape(user.Email),
+		userToken,
 	)
 	c.Redirect(http.StatusTemporaryRedirect, redirectURL)
 	return
