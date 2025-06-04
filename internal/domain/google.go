@@ -81,3 +81,7 @@ func (d *domain) SaveToken(ctx context.Context, code string) (User, error) {
 
 	return user, nil
 }
+
+func (d *domain) IsFirstLogin(ctx context.Context, email string) bool {
+	return d.db.GetGoogleToken(ctx, email) != nil
+}

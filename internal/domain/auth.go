@@ -20,7 +20,3 @@ func (d *domain) Login(ctx context.Context, email, password string) (string, err
 
 	return token, nil
 }
-
-func (d *domain) FindByEmail(ctx context.Context, email string) (User, error) {
-	return d.db.FindByEmail(ctx, email)
-}

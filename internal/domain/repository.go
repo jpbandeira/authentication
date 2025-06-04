@@ -9,4 +9,5 @@ type Repository interface {
 	FindByEmail(ctx context.Context, email string) (User, error)
 
 	SaveGoogleToken(ctx context.Context, googleToken GoogleToken) error
+	GetGoogleToken(ctx context.Context, email string) error
 }

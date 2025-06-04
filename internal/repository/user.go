@@ -31,6 +31,7 @@ func (db *GormRepository) FindByEmail(ctx context.Context, email string) (domain
 		log.Printf("[%v] erro ao buscar usuário por email: %v", ctx.Value("req_id"), err)
 		return domain.User{}, err
 	}
+
 	return domain.User{
 		ID:       user.UUID,
 		Name:     user.Name,

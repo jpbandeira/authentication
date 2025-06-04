@@ -9,14 +9,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const (
+	basePath string = "/authentication"
+)
+
 func Setup(ctx context.Context, handler *handler.AuthHandler) *gin.Engine {
 	router := gin.Default()
 	router.HandleMethodNotAllowed = true
 	router.Use(cors.Default())
 
-	router.POST("/register", handler.Register)
-	router.POST("/login", handler.Login)
-	router.GET("/auth/google/callback", handler.GoogleCallbackHandler)
+	router.POST(basePath+"/user/register", handler.Register)
+	router.GET(basePath+"/user/:email", handler.FindByEmail)
+	router.POST(basePath+"/login", handler.Login)
+	router.GET(basePath+"/auth/google/callback", handler.GoogleCallbackHandler)
+	router.GET(basePath+"/first-login/:email", handler.IsFirstLogin)
 
 	return router
 }

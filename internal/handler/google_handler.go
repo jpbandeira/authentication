@@ -36,3 +36,14 @@ func (h *AuthHandler) GoogleCallbackHandler(c *gin.Context) {
 	c.Redirect(http.StatusTemporaryRedirect, redirectURL)
 	return
 }
+
+func (h *AuthHandler) IsFirstLogin(c *gin.Context) {
+	ctx := c.Request.Context()
+	email := c.Param("email")
+	if email == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing email"})
+		return
+	}
+
+	c.JSON(http.StatusOK, h.domain.IsFirstLogin(ctx, email))
+}
