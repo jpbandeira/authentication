@@ -21,6 +21,14 @@ func (h *AuthHandler) GoogleCallbackHandler(c *gin.Context) {
 
 	userToken, err := h.domain.GoogleOAuthLogin(ctx, code)
 	if err != nil {
+		if err.Error() == "not found" {
+			redirectURL := fmt.Sprintf(
+				"http://local.fidelity.com:%s/login?error=user_not_found",
+				h.ClientPort,
+			)
+			c.Redirect(http.StatusTemporaryRedirect, redirectURL)
+			return
+		}
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}

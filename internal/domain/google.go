@@ -3,6 +3,7 @@ package domain
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"os"
 	"time"
@@ -66,6 +67,9 @@ func (d *domain) GoogleOAuthLogin(ctx context.Context, code string) (string, err
 
 	user, err := d.db.FindByEmail(ctx, email)
 	if err != nil {
+		if user.ID == "" {
+			return "", errors.New("not found")
+		}
 		return "", err
 	}
 
