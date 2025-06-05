@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"os"
 	"time"
@@ -45,7 +46,7 @@ func (d *domain) GoogleOAuthLogin(ctx context.Context, code string) (string, err
 	var googleOAuthConfig = &oauth2.Config{
 		ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
 		ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
-		RedirectURL:  "http://local.fidelity.com:8083/auth/google/callback",
+		RedirectURL:  fmt.Sprintf("http://local.fidelity.com:%s/authentication/auth/google/callback", "30081"),
 		Scopes: []string{
 			"https://www.googleapis.com/auth/calendar.readonly",
 			"https://www.googleapis.com/auth/userinfo.email",

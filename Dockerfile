@@ -14,7 +14,9 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -o authentication ./cmd/authentication
 
 # Etapa 2: imagem final
-FROM alpine:latest
+FROM alpine:3.18
+
+RUN apk add --no-cache ca-certificates
 
 WORKDIR /root/
 
